@@ -1,28 +1,31 @@
 # BTC Daily Report Automation
 
-This project automatically fetches the **Bitcoin (BTC) price** from the CoinGecko API, stores it in a **PostgreSQL database running inside Docker**, computes statistics from the most recent records, and sends a **daily email report**.
+This project automatically fetches the **Bitcoin (BTC) price** from the CoinGecko API, stores it in a **PostgreSQL database running inside Docker**, computes statistics from recent records, and sends a **daily email report**.
 
-It demonstrates a simple **data automation pipeline** using Python, APIs, Docker, PostgreSQL, and SMTP email.
+The automation runs daily using **Windows Task Scheduler**.
 
 ---
 
-# Project Features
+# Features
 
 - Fetch BTC price from CoinGecko API
 - Store price data in PostgreSQL
-- Run PostgreSQL inside Docker
-- Compute statistics from the latest records
-- Send formatted email report
+- PostgreSQL runs inside Docker
+- Compute statistics from recent records
+- Send automated email report
+- Logging system for monitoring
+- Error handling and retry logic
+- Automated scheduling with Windows Task Scheduler
 
 ---
 
 # Tech Stack
 
-- Python
-- PostgreSQL
-- Docker
-- CoinGecko API
-- SMTP (Gmail)
+Python  
+PostgreSQL  
+Docker  
+CoinGecko API  
+SMTP (Gmail)
 
 Python libraries used:
 
@@ -30,6 +33,7 @@ Python libraries used:
 - psycopg[binary]
 - python-dotenv
 - pandas
+- logging
 
 ---
 
@@ -44,11 +48,12 @@ src/
 - fetch_btc.py
 - report.py
 - email_send.py
+- logger.py
 
 sql/
 - init.sql
 
-tests/
+logs/
 
 docker-compose.yml  
 requirements.txt  
@@ -57,9 +62,7 @@ README.md
 
 ---
 
-# How the Project Works
-
-The script runs this pipeline:
+# Pipeline
 
 CoinGecko API  
 ↓  
@@ -67,7 +70,7 @@ Fetch BTC price (requests)
 ↓  
 Store data in PostgreSQL (psycopg)  
 ↓  
-Retrieve last records  
+Retrieve recent records  
 ↓  
 Generate report  
 ↓  
@@ -75,73 +78,117 @@ Send email via SMTP
 
 ---
 
-# Setup Instructions
+# Setup
 
-## 1 Clone the Repository
+## Clone repository
 
+```
 git clone https://github.com/YOUR_USERNAME/btc-daily-report-automation.git
-
 cd btc-daily-report-automation
+```
 
 ---
 
-## 2 Create Virtual Environment
+## Create virtual environment
 
+```
 python -m venv .venv
+```
 
-Activate it (Windows):
+Activate:
 
+Windows
+
+```
 source .venv/Scripts/activate
+```
 
 ---
 
-## 3 Install Dependencies
+## Install dependencies
 
+```
 python -m pip install -r requirements.txt
+```
 
 ---
 
-## 4 Configure Environment Variables
+## Configure environment variables
 
-Create a `.env` file based on `.env.example`.
+Create `.env` using `.env.example`.
 
 Example:
 
-DB_HOST=localhost  
-DB_PORT=5434  
-DB_USER=btc_user  
-DB_PASSWORD=btc_password  
-DB_NAME=btc_db  
+```
+DB_HOST=localhost
+DB_PORT=5434
+DB_USER=btc_user
+DB_PASSWORD=btc_password
+DB_NAME=btc_db
 
-EMAIL_FROM=your_email@gmail.com  
-EMAIL_TO=receiver@gmail.com  
-EMAIL_APP_PASSWORD=your_app_password  
+EMAIL_FROM=your_email@gmail.com
+EMAIL_TO=receiver@gmail.com
+EMAIL_APP_PASSWORD=your_app_password
 
-SMTP_HOST=smtp.gmail.com  
-SMTP_PORT=587  
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+```
 
 ---
 
-## 5 Start PostgreSQL with Docker
+## Start PostgreSQL
 
+```
 docker compose up -d
+```
 
-Verify container:
+Verify:
 
+```
 docker ps
+```
 
 ---
 
-## 6 Run the Project
+## Run project
 
+```
 python -m src.main
+```
 
-The script will:
+---
 
-1 Fetch BTC price  
-2 Store it in the database  
-3 Generate report  
-4 Send email  
+# Logging
+
+Application logs are stored in:
+
+```
+logs/app.log
+```
+
+Scheduler debug logs:
+
+```
+logs/scheduler_debug.log
+```
+
+---
+
+# Automation
+
+The script runs automatically using **Windows Task Scheduler**.
+
+A batch script:
+
+```
+run_report.bat
+```
+
+activates the virtual environment and runs:
+
+```
+python -m src.main
+```
 
 ---
 
@@ -150,44 +197,42 @@ The script will:
 BTC Daily Report
 
 Records: 7  
-Latest price: $68044  
-Average price: $67500  
-High price: $69200  
-Low price: $65300  
-Change: $2744  
-Percent change: 4.2%
+Latest price: $70322  
+Average price: $69800  
+High price: $71000  
+Low price: $68000  
 
-Recent prices
+Recent prices:
 
-1. $68044  
-2. $67900  
-3. $67100  
+1. $70322  
+2. $70110  
+3. $69840  
 
 ---
 
-# Security Notes
+# Error Handling
 
-`.env` is excluded from GitHub using `.gitignore`.
+The script includes:
 
-Do not commit secrets or passwords.
-
-Use Gmail **App Password**, not your real Gmail password.
+- try/except job wrapper
+- API retry logic
+- logging of exceptions
+- graceful failure handling
 
 ---
 
 # Future Improvements
 
-Possible improvements:
+Possible extensions:
 
-- Schedule script daily using Windows Task Scheduler
-- Add error handling
-- Add logging
-- Create dashboard for price history
-- Deploy on a cloud server
+- BTC price charts
+- CSV export
+- dashboard visualization
+- deployment on cloud server
+- cron scheduling on Linux
 
 ---
 
 # Author
 
 Amit Sharma
-

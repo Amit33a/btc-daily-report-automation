@@ -2,29 +2,39 @@ from src.fetch_btc import fetch_btc_price
 from src.db import create_table, insert_price, get_last_7_days
 from src.report import build_report
 from src.email_send import send_email
+from src.logger import setup_logger
+
+
+logger = setup_logger()
 
 
 def main():
+    try:
+        logger.info("Starting BTC daily report job")
 
-    # Ensure table exists
-    create_table()
+        create_table()
+        logger.info("Table checked/created successfully")
 
-    # Fetch latest BTC price
-    price = fetch_btc_price()
+        price = fetch_btc_price()
+        logger.info(f"Fetched BTC price: {price}")
 
-    # Insert price into database
-    insert_price(price)
+        insert_price(price)
+        logger.info("Inserted BTC price into database")
 
-    # Read last 7 records
-    rows = get_last_7_days()
+        rows = get_last_7_days()
+        logger.info(f"Fetched {len(rows)} recent records from database")
 
-    # Build report text
-    report_text = build_report(rows)
+        report_text = build_report(rows)
+        logger.info("Report built successfully")
 
-    # Send email
-    send_email("BTC Daily Report", report_text)
+        send_email("BTC Daily Report", report_text)
+        logger.info("Email sent successfully")
 
-    print("Report generated and email sent successfully")
+        print("Report generated and email sent successfully")
+
+    except Exception as e:
+        logger.exception(f"Job failed: {e}")
+        print("Job failed. Check logs/app.log for details.")
 
 
 if __name__ == "__main__":
