@@ -252,6 +252,24 @@ These logs help diagnose errors and monitor automation runs.
 
 ---
 
+# Error Handling
+
+The main script contains centralized error handling.
+
+If an exception occurs during execution:
+
+- The error is written to `logs/app.log`
+- A message is printed to the console
+- The task is marked as failed for Task Scheduler
+
+Example failure message:
+
+```
+Job failed. Check logs/app.log for details.
+```
+
+---
+
 # Automation with Windows Task Scheduler
 
 The project includes a batch script:
@@ -267,6 +285,8 @@ This script:
 3. Runs the Python automation script
 
 Task Scheduler runs this script daily to automate the pipeline.
+
+The script returns a **non-zero exit code on failure**, allowing Task Scheduler to detect unsuccessful runs.
 
 ---
 
